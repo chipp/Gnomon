@@ -20,19 +20,15 @@ public enum Gnomon {
     interceptors.append(asyncInterceptor)
   }
 
-    public static func removeAllInterceptors() {
+  public static func removeAllInterceptors() {
     interceptors.removeAll()
   }
 
   public static func models<U>(for request: Request<U>) -> Observable<Response<U>> {
-    do {
-      return try observable(for: request, localCache: false).flatMap { data, response -> Observable<Response<U>> in
-        let type: ResponseType = response.resultFromHTTPCache && !request.disableHttpCache ? .httpCache : .regular
-        return try parse(data: data, response: response, responseType: type, for: request)
-          .subscribeOn(ConcurrentDispatchQueueScheduler(qos: request.dispatchQoS))
-      }
-    } catch {
-      return .error(error)
+    return observable(for: request, localCache: false).flatMap { data, response -> Observable<Response<U>> in
+      let type: ResponseType = response.resultFromHTTPCache && !request.disableHttpCache ? .httpCache : .regular
+      return try parse(data: data, response: response, responseType: type, for: request)
+        .subscribeOn(ConcurrentDispatchQueueScheduler(qos: request.dispatchQoS))
     }
   }
 
@@ -41,19 +37,15 @@ public enum Gnomon {
   }
 
   private static func cachedModels<U>(for request: Request<U>, catchErrors: Bool) -> Observable<Response<U>> {
-    do {
-      let result = try observable(for: request, localCache: true).flatMap { data, response in
-        return try parse(data: data, response: response, responseType: .localCache, for: request)
-          .subscribeOn(ConcurrentDispatchQueueScheduler(qos: request.dispatchQoS))
-      }
+    let result = observable(for: request, localCache: true).flatMap { data, response in
+      return try parse(data: data, response: response, responseType: .localCache, for: request)
+        .subscribeOn(ConcurrentDispatchQueueScheduler(qos: request.dispatchQoS))
+    }
 
-      if catchErrors {
-        return result.catchError { _ in return Observable<Response<U>>.empty() }
-      } else {
-        return result
-      }
-    } catch {
-      return .error(error)
+    if catchErrors {
+      return result.catchError { _ in return Observable<Response<U>>.empty() }
+    } else {
+      return result
     }
   }
 
@@ -112,26 +104,27 @@ public enum Gnomon {
       let policy = try cachePolicy(for: request, localCache: localCache)
       let session = URLSession(configuration: configuration(with: policy), delegate: delegate, delegateQueue: nil)
 
-      return (try prepareURLRequest(from: request, cachePolicy: policy, interceptors: interceptors)).flatMap { urlRequest -> Observable<(Data, HTTPURLResponse)> in
+      return try prepareURLRequest(from: request, cachePolicy: policy, interceptors: interceptors)
+        .flatMap { urlRequest -> Observable<(Data, HTTPURLResponse)> in
 
-        curlLog(request, urlRequest)
+          curlLog(request, urlRequest)
 
-        #if TEST
-        guard request.shouldRunTask else { return result }
-        #endif
+          #if TEST
+          guard request.shouldRunTask else { return result }
+          #endif
 
-        let task = session.dataTask(with: urlRequest)
-        task.resume()
-        session.finishTasksAndInvalidate()
+          let task = session.dataTask(with: urlRequest)
+          task.resume()
+          session.finishTasksAndInvalidate()
 
-        return result.do(onDispose: {
-          if #available(iOS 10.0, *) {
-            if task.state == .running {
-              task.cancel()
+          return result.do(onDispose: {
+            if #available(iOS 10.0, *) {
+              if task.state == .running {
+                task.cancel()
+              }
             }
-          }
-        }).share(replay: 1, scope: .whileConnected)
-      }
+          }).share(replay: 1, scope: .whileConnected)
+        }
     }
   }
 

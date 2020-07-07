@@ -13,7 +13,7 @@ PODS:
   - Nimble (7.3.4)
   - RxBlocking (5.0.1):
     - RxSwift (~> 5)
-  - RxSwift (5.0.1)
+  - RxSwift (5.1.1)
   - SwiftLint (0.37.0)
   - SwiftyJSON (5.0.0)
 
@@ -44,7 +44,7 @@ SPEC CHECKSUMS:
   Gnomon: a2ca23e71157963b72347549b8eef058bc2fcbff
   Nimble: 051e3d8912d40138fa5591c78594f95fb172af37
   RxBlocking: c5e090f42d046df8b0e7752742510f349963710f
-  RxSwift: e2dc62b366a3adf6a0be44ba9f405efd4c94e0c4
+  RxSwift: 81470a2074fa8780320ea5fe4102807cb7118178
   SwiftLint: c078a14d7d7ade75e5507795d185e3da41d844d2
   SwiftyJSON: 36413e04c44ee145039d332b4f4e2d3e8d6c4db7
 

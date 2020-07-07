@@ -24,7 +24,7 @@ class ParamsSpec: XCTestCase {
       do {
         let request = try Request<String>(URLString: "https://example.com").setMethod(method)
           .setParams(.query(["key1": "value1", "key2": ["1", "2"]]))
-        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
+        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: []).toBlocking().first()!
 
         expect(urlRequest.url) == URL(string: "https://example.com?key1=value1&key2%5B%5D=1&key2%5B%5D=2")!
       } catch {
@@ -38,7 +38,7 @@ class ParamsSpec: XCTestCase {
       do {
         let request = try Request<String>(URLString: "https://example.com").setMethod(method)
           .setParams(.urlEncoded(["key1": "value1", "key2": ["1", "2"]]))
-        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
+        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: []).toBlocking().first()!
 
         expect(urlRequest.httpBody) == "key1=value1&key2%5B%5D=1&key2%5B%5D=2".data(using: .utf8)!
         expect(urlRequest.allHTTPHeaderFields!["Content-Type"]) == "application/x-www-form-urlencoded"
@@ -51,7 +51,7 @@ class ParamsSpec: XCTestCase {
       do {
         let request = try Request<String>(URLString: "https://example.com").setMethod(method)
           .setParams(.urlEncoded(["key1": "value1", "key2": ["1", "2"]]))
-        _ = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
+        _ = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: []).toBlocking().first()!
         fail("should fail")
       } catch let error as String {
         expect(error) == "\(method.description) request can't have a body"
@@ -66,7 +66,7 @@ class ParamsSpec: XCTestCase {
       do {
         let request = try Request<String>(URLString: "https://example.com").setMethod(method)
           .setParams(.json(["key1": "value1", "key2": ["1", "2"]]))
-        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
+        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: []).toBlocking().first()!
 
         expect(urlRequest.httpBody).notTo(beNil())
         let json = urlRequest.httpBody.map({ try! JSONSerialization.jsonObject(with: $0) }) as! [String: Any]
@@ -102,7 +102,7 @@ class ParamsSpec: XCTestCase {
       do {
         let request = try Request<String>(URLString: "https://example.com").setMethod(method)
           .setParams(.multipart(form, [:]))
-        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
+        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: []).toBlocking().first()!
 
         expect(urlRequest.httpBody).notTo(beNil())
 
@@ -140,7 +140,7 @@ class ParamsSpec: XCTestCase {
       do {
         let request = try Request<String>(URLString: "https://example.com").setMethod(method)
           .setParams(.multipart([:], ["upload": file]))
-        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
+        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: []).toBlocking().first()!
 
         expect(urlRequest.httpBody).notTo(beNil())
 
@@ -181,7 +181,7 @@ class ParamsSpec: XCTestCase {
 
         let request = try Request<String>(URLString: "https://example.com").setMethod(method)
           .setParams(.multipart(form, ["upload": file]))
-        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
+        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: []).toBlocking().first()!
 
         expect(urlRequest.httpBody).notTo(beNil())
 
@@ -218,7 +218,7 @@ class ParamsSpec: XCTestCase {
       do {
         let request = try Request<String>(URLString: "https://example.com").setMethod(method)
           .setParams(.data(data, contentType: "application/octet-stream"))
-        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
+        let urlRequest = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: []).toBlocking().first()!
 
         expect(urlRequest.httpBody).notTo(beNil())
 
@@ -235,7 +235,7 @@ class ParamsSpec: XCTestCase {
       do {
         let request = try Request<String>(URLString: "https://example.com").setMethod(method)
           .setParams(.data(data, contentType: "application/octet-stream"))
-        _ = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
+        _ = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: []).toBlocking().first()!
         fail("should fail")
       } catch let error as String {
         expect(error) == "\(method.description) request can't have a body"

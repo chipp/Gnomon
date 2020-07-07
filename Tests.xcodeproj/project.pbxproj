@@ -222,7 +222,9 @@
 				900B1227D5B909619DD28006 /* Pods */,
 				92C97BAB6AB21C884702491A /* Frameworks */,
 			);
+			indentWidth = 2;
 			sourceTree = "<group>";
+			tabWidth = 2;
 		};
 		B59E9BA71EC361EC002018AE /* Products */ = {
 			isa = PBXGroup;
