@@ -42,7 +42,7 @@ extension JSON: DataContainerProtocol {
     if let path = path {
       let xpathed = try json.xpath(path)
       if let error = xpathed.error {
-        throw Gnomon.Error.unableToParseModel(error)
+        throw GnomonError.unableToParseModel(error)
       }
 
       return xpathed

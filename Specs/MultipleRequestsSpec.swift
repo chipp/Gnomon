@@ -87,7 +87,7 @@ class MultipleRequestsSpec: XCTestCase {
 
         switch results[0] {
         case .success: fail("request should fail")
-        case let .failure(Gnomon.Error.unableToParseModel(message as String)):
+        case let .failure(GnomonError.unableToParseModel(message as String)):
           expect(message) == "<key> value is invalid = <null>"
         case let .failure(error): fail("\(error)")
         }
@@ -265,7 +265,7 @@ class MultipleRequestsSpec: XCTestCase {
 
         switch results[1] {
         case .success: fail("request should fail")
-        case let .failure(Gnomon.Error.errorStatusCode(code, _)): expect(code) == 404
+        case let .failure(GnomonError.errorStatusCode(code, _)): expect(code) == 404
         case let .failure(error): fail("\(error)")
         }
 
@@ -279,7 +279,7 @@ class MultipleRequestsSpec: XCTestCase {
       }
     } catch {
       switch error {
-      case Gnomon.Error.errorStatusCode(let code, let data):
+      case GnomonError.errorStatusCode(let code, let data):
         expect(code).to(equal(404))
         expect(data).toNot(beNil())
       default: fail("should't fail with other type of error")

@@ -41,7 +41,7 @@ public struct XMLContainer: DataContainerProtocol {
     if let path = path {
       let xpathed = xml.xpath(path)
       if let error = xpathed.error {
-        throw Gnomon.Error.unableToParseModel(error)
+        throw GnomonError.unableToParseModel(error)
       }
 
       return self.init(element: xpathed, document: xml)

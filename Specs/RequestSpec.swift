@@ -261,7 +261,7 @@ class RequestSpec: XCTestCase {
       switch result {
       case .completed:
         fail("request should fail")
-      case let .failed(_, Gnomon.Error.errorStatusCode(401, data)):
+      case let .failed(_, GnomonError.errorStatusCode(401, data)):
         expect(String(data: data, encoding: .utf8)) == "error string"
       case let .failed(_, error):
         fail("\(error)")

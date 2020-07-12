@@ -93,7 +93,7 @@ public enum Gnomon {
         let (data, response) = tuple
 
         guard (200 ..< 400) ~= response.statusCode else {
-          throw Gnomon.Error.errorStatusCode(response.statusCode, data)
+          throw GnomonError.errorStatusCode(response.statusCode, data)
         }
 
         return tuple

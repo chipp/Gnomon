@@ -70,12 +70,12 @@ final class SessionDelegate: NSObject, URLSessionDataDelegate, SessionDelegatePr
       subject.onError(error)
     } else {
       guard let response = response else {
-        subject.onError(Gnomon.Error.undefined(message: nil))
+        subject.onError(GnomonError.undefined(message: nil))
         return
       }
 
       guard let httpResponse = response as? HTTPURLResponse else {
-        subject.onError(Gnomon.Error.nonHTTPResponse(response: response))
+        subject.onError(GnomonError.nonHTTPResponse(response: response))
         return
       }
 

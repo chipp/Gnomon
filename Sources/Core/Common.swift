@@ -9,23 +9,6 @@ import RxSwift
 extension String: Error {
 }
 
-@available(*, deprecated, renamed: "Gnomon.Error")
-public enum CommonError: Swift.Error {
-  case none
-}
-
-public extension Gnomon {
-
-  enum Error: Swift.Error {
-    case undefined(message: String?)
-    case nonHTTPResponse(response: URLResponse)
-    case invalidResponse
-    case unableToParseModel(Swift.Error)
-    case errorStatusCode(Int, Data)
-  }
-
-}
-
 extension HTTPURLResponse {
 
   private static var cacheFlagKey = "X-ResultFromHttpCache"
@@ -53,8 +36,9 @@ func cachePolicy<U>(for request: Request<U>, localCache: Bool) throws -> URLRequ
   }
 }
 
-func prepareURLRequest<U>(from request: Request<U>, cachePolicy: URLRequest.CachePolicy,
-                          interceptors: [AsyncInterceptor]) throws -> Observable<URLRequest> {
+func prepareURLRequest<U>(
+    from request: Request<U>, cachePolicy: URLRequest.CachePolicy, interceptors: [AsyncInterceptor]
+) throws -> Observable<URLRequest> {
   var urlRequest = URLRequest(url: request.url, cachePolicy: cachePolicy, timeoutInterval: request.timeout)
   urlRequest.httpMethod = request.method.description
   if let headers = request.headers {
@@ -99,15 +83,14 @@ func prepareURLRequest<U>(from request: Request<U>, cachePolicy: URLRequest.Cach
   return process(urlRequest, for: request, with: interceptors)
 }
 
-private func process<U>(_ urlRequest: URLRequest, for request: Request<U>,
-                        with interceptors: [AsyncInterceptor]) -> Observable<URLRequest> {
-  if let asynInterceptor = request.asyncInterceptor ?? request.interceptor.map { interceptor in { urlRequest in
-    Observable<URLRequest>.deferred { .just(interceptor(urlRequest)) }
-    }} {
+private func process<U>(
+    _ urlRequest: URLRequest, for request: Request<U>, with interceptors: [AsyncInterceptor]
+) -> Observable<URLRequest> {
+  if let asyncInterceptor = request.asyncInterceptor ?? request.interceptor.map(asynchronizeInterceptor) {
     if request.isInterceptorExclusive {
-      return asynInterceptor(urlRequest)
+      return asyncInterceptor(urlRequest)
     } else {
-      var urlRequest = asynInterceptor(urlRequest)
+      var urlRequest = asyncInterceptor(urlRequest)
       urlRequest = interceptors.reduce(urlRequest) { request, interceptor in
         request.flatMap { interceptor($0) }
       }
@@ -117,6 +100,12 @@ private func process<U>(_ urlRequest: URLRequest, for request: Request<U>,
     return interceptors.reduce(.just(urlRequest)) { request, interceptor in
       request.flatMap { interceptor($0) }
     }
+  }
+}
+
+private func asynchronizeInterceptor(_ interceptor: @escaping Interceptor) -> AsyncInterceptor {
+  { request in
+    Observable.deferred { .just(interceptor(request)) }
   }
 }
 
@@ -168,49 +157,46 @@ private func prepare(value: Any, with key: String?) -> [URLQueryItem] {
   }
 }
 
-func prepareMultipartData(with form: [String: String],
-                          _ files: [String: MultipartFile]) throws -> (data: Data, contentType: String) {
+func prepareMultipartData(
+    with form: [String: String], _ files: [String: MultipartFile]
+) throws -> (data: Data, contentType: String) {
   let boundary = "__X_NST_BOUNDARY__"
   var data = Data()
-  guard let boundaryData = "--\(boundary)\r\n".data(using: .utf8) else { throw "can't encode boundary" }
-  try form.keys.sorted().forEach { key in
-    guard let value = form[key] else {
-      throw "can't encode key \(key)"
-    }
 
+  let boundaryData = "--\(boundary)\r\n".data(using: .utf8)!
+
+  try form.sorted { $0.key < $1.key }.forEach { key, value in
     data.append(boundaryData)
+
     guard let dispositionData = "Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8) else {
-      throw "can't encode key \(key)"
+      throw MultipartEncodingError.invalidKeyString(key)
     }
     data.append(dispositionData)
-    guard let valueData = (value + "\r\n").data(using: .utf8) else { throw "can't encode value \(value)" }
+
+    guard let valueData = (value + "\r\n").data(using: .utf8) else {
+      throw MultipartEncodingError.invalidValueString(value)
+    }
     data.append(valueData)
   }
 
-  try files.keys.sorted().forEach { key in
-    guard let file = files[key] else {
-      throw "can't find file for key \(key)"
-    }
-
+  try files.sorted { $0.key < $1.key }.forEach { key, file in
     data.append(boundaryData)
-    guard let dispositionData = "Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(file.filename)\"\r\n"
-      .data(using: .utf8) else { throw "can't encode key \(key)" }
+
+    guard let dispositionData = "Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(file.filename)\"\r\n".data(using: .utf8) else {
+        throw MultipartEncodingError.invalidKeyOrFileName(key: key, fileName: file.filename)
+    }
     data.append(dispositionData)
+
     guard let contentTypeData = "Content-Type: \(file.contentType)\r\n\r\n".data(using: .utf8) else {
-      throw "can't encode content-type \(file.contentType)"
+      throw MultipartEncodingError.invalidContentTypeString(file.contentType)
     }
     data.append(contentTypeData)
+
     data.append(file.data)
-    guard let carriageReturnData = "\r\n".data(using: .utf8) else {
-      throw "can't encode carriage return"
-    }
-    data.append(carriageReturnData)
+    data.append("\r\n".data(using: .utf8)!)
   }
 
-  guard let closingBoundaryData = "--\(boundary)--\r\n".data(using: .utf8) else {
-    throw "can't encode closing boundary"
-  }
-  data.append(closingBoundaryData)
+  data.append("--\(boundary)--\r\n".data(using: .utf8)!)
   return (data, "multipart/form-data; boundary=\(boundary)")
 }
 
