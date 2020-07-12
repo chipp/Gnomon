@@ -26,7 +26,7 @@ extension Bool: DataContainerProtocol {
   public typealias Iterator = GenericDataContainerIterator<Bool>
 
   public static func container(with data: Data, at path: String?) throws -> Bool {
-    preconditionFailure("this method should not be called since StringModel.dataContainer is implemented")
+    preconditionFailure("this method should not be called since BoolModel.dataContainer is implemented")
   }
 
   public func multiple() -> GenericDataContainerIterator<Bool>? {

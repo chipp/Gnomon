@@ -11,6 +11,12 @@ public enum GnomonError: Error {
   case dataContainerDoesNotSupportArrays(containerType: String)
 
   case invalidURLString(String)
+  case localCacheWasDisabledInRequest
+  case invalidRelativeURL(URL)
+}
+
+public enum URLRequestError: Error {
+  case methodDoesNotSupportBody(Method)
 }
 
 public enum MultipartEncodingError: Error {
@@ -34,5 +40,11 @@ import struct SwiftyJSON.JSON
 public enum JSONParseError: Error {
   case emptyXPath
   case noKeyInJSON(key: String, json: JSON)
+}
+#endif
+
+#if DECODABLE
+public struct DecodableXPathError: Error {
+  public let xpath: String
 }
 #endif

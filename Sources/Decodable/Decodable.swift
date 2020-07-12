@@ -24,7 +24,7 @@ public extension DecodableModel {
 
   static var decoder: JSONDecoder { return JSONDecoder() }
 
-    static func dataContainer(with data: Data, at path: String?) throws -> DecoderContainer {
+  static func dataContainer(with data: Data, at path: String?) throws -> DecoderContainer {
     let decoder = Self.decoder
     decoder.userInfo[.xpath] = path
     return try decoder.decode(DecoderContainer.self, from: data)
@@ -42,15 +42,15 @@ private struct EmptyDecoder: Decoder {
   let userInfo: [CodingUserInfoKey: Any] = [:]
 
   func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
-    throw "decoder is empty"
+    fatalError("decoder is empty")
   }
 
   func unkeyedContainer() throws -> UnkeyedDecodingContainer {
-    throw "decoder is empty"
+    fatalError("decoder is empty")
   }
 
   func singleValueContainer() throws -> SingleValueDecodingContainer {
-    throw "decoder is empty"
+    fatalError("decoder is empty")
   }
 
 }
@@ -90,7 +90,7 @@ public struct DecoderContainer: DataContainerProtocol, Decodable {
   public typealias Iterator = UnkeyedDecodingContainerIterator
 
   public static func container(with data: Data, at path: String?) throws -> DecoderContainer {
-    throw "container should be parsed in DecodableModel"
+    preconditionFailure("this method should not be called since DecodableModel.dataContainer is implemented")
   }
 
   public func multiple() -> UnkeyedDecodingContainerIterator? {

@@ -128,8 +128,7 @@ class URLRequestGenerationSpec: XCTestCase {
       let request = try Request<String>(URLString: "https://example.com").setDisableLocalCache(true)
       _ = try cachePolicy(for: request, localCache: true)
       fail("should fail")
-    } catch let error as String {
-      expect(error) == "local cache was disabled in request"
+    } catch GnomonError.localCacheWasDisabledInRequest {
     } catch {
       fail("\(error)")
     }
@@ -146,8 +145,7 @@ class URLRequestGenerationSpec: XCTestCase {
       let request = try Request<String>(URLString: "https://example.com").setDisableCache(true)
       _ = try cachePolicy(for: request, localCache: true)
       fail("should fail")
-    } catch let error as String {
-      expect(error) == "local cache was disabled in request"
+    } catch GnomonError.localCacheWasDisabledInRequest {
     } catch {
       fail("\(error)")
     }

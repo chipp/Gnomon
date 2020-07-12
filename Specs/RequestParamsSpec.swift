@@ -53,8 +53,8 @@ class ParamsSpec: XCTestCase {
           .setParams(.urlEncoded(["key1": "value1", "key2": ["1", "2"]]))
         _ = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: []).toBlocking().first()!
         fail("should fail")
-      } catch let error as String {
-        expect(error) == "\(method.description) request can't have a body"
+      } catch URLRequestError.methodDoesNotSupportBody(let failed) {
+        expect(failed) == method
       } catch {
         fail("\(error)")
       }
@@ -87,8 +87,8 @@ class ParamsSpec: XCTestCase {
           .setParams(.json(["key1": "value1", "key2": ["1", "2"]]))
         _ = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
         fail("should fail")
-      } catch let error as String {
-        expect(error) == "\(method.description) request can't have a body"
+      } catch URLRequestError.methodDoesNotSupportBody(let failed) {
+        expect(failed) == method
       } catch {
         fail("\(error)")
       }
@@ -124,8 +124,8 @@ class ParamsSpec: XCTestCase {
           .setParams(.multipart(form, [:]))
         _ = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
         fail("should fail")
-      } catch let error as String {
-        expect(error) == "\(method.description) request can't have a body"
+      } catch URLRequestError.methodDoesNotSupportBody(let failed) {
+        expect(failed) == method
       } catch {
         fail("\(error)")
       }
@@ -162,8 +162,8 @@ class ParamsSpec: XCTestCase {
           .setParams(.multipart([:], ["upload": file]))
         _ = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
         fail("should fail")
-      } catch let error as String {
-        expect(error) == "\(method.description) request can't have a body"
+      } catch URLRequestError.methodDoesNotSupportBody(let failed) {
+        expect(failed) == method
       } catch {
         fail("\(error)")
       }
@@ -203,8 +203,8 @@ class ParamsSpec: XCTestCase {
           .setParams(.multipart(form, ["upload": file]))
         _ = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: [])
         fail("should fail")
-      } catch let error as String {
-        expect(error) == "\(method.description) request can't have a body"
+      } catch URLRequestError.methodDoesNotSupportBody(let failed) {
+        expect(failed) == method
       } catch {
         fail("\(error)")
       }
@@ -237,8 +237,8 @@ class ParamsSpec: XCTestCase {
           .setParams(.data(data, contentType: "application/octet-stream"))
         _ = try prepareURLRequest(from: request, cachePolicy: .useProtocolCachePolicy, interceptors: []).toBlocking().first()!
         fail("should fail")
-      } catch let error as String {
-        expect(error) == "\(method.description) request can't have a body"
+      } catch URLRequestError.methodDoesNotSupportBody(let failed) {
+        expect(failed) == method
       } catch {
         fail("\(error)")
       }

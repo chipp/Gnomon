@@ -9,7 +9,7 @@ import RxSwift
 public typealias AuthenticationChallenge = (URLAuthenticationChallenge,
                                             (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) -> Void
 
-public enum Method: CustomStringConvertible {
+public enum Method: Equatable, CustomStringConvertible {
 
   case GET, HEAD, POST, PUT, PATCH, DELETE
   case custom(String, hasBody: Bool)

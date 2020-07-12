@@ -6,9 +6,6 @@
 import Foundation
 import RxSwift
 
-extension String: Error {
-}
-
 extension HTTPURLResponse {
 
   private static var cacheFlagKey = "X-ResultFromHttpCache"
@@ -29,7 +26,7 @@ extension HTTPURLResponse {
 
 func cachePolicy<U>(for request: Request<U>, localCache: Bool) throws -> URLRequest.CachePolicy {
   if localCache {
-    guard !request.disableLocalCache else { throw "local cache was disabled in request" }
+    guard !request.disableLocalCache else { throw GnomonError.localCacheWasDisabledInRequest }
     return .returnCacheDataDontLoad
   } else {
     return request.disableHttpCache ? .reloadIgnoringLocalCacheData : .useProtocolCachePolicy
@@ -55,7 +52,7 @@ func prepareURLRequest<U>(
   case let (_, .query(params)):
     urlRequest.url = try prepareURL(with: request.url, params: params)
   case (false, _):
-    throw "\(request.method.description) request can't have a body"
+    throw URLRequestError.methodDoesNotSupportBody(request.method)
   case (true, let .urlEncoded(params)):
     let queryItems = prepare(value: params, with: nil)
     var components = URLComponents()
@@ -116,13 +113,12 @@ func prepareURL(with url: URL, params: [String: Any]?) throws -> URL {
   }
 
   guard var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
-    throw "can't parse provided URL \"\(url)\""
+    throw GnomonError.invalidRelativeURL(url)
   }
 
   queryItems.append(contentsOf: components.queryItems ?? [])
   components.queryItems = queryItems.count > 0 ? queryItems : nil
-  guard let url = components.url else { throw "can't prepare URL from components: \(components)" }
-  return url
+  return components.url!
 }
 
 private func prepare(value: Any, with key: String?) -> [URLQueryItem] {

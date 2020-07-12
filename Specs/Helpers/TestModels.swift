@@ -10,6 +10,8 @@ import SwiftyJSON
 import AEXML
 import Gnomon
 
+extension String: Error {}
+
 struct TestModel1: JSONModel {
 
   let key: Int

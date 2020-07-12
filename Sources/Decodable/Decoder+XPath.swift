@@ -15,8 +15,9 @@ public struct Path: CodingKey {
 
     static func parse(string: String) -> [Component] {
       do {
-        guard string.hasSuffix("]") else { throw "" }
-        guard let range = string.range(of: "(\\[(\\d)\\])+$", options: .regularExpression) else { throw "" }
+        guard string.hasSuffix("]"), let range = string.range(of: "(\\[(\\d)\\])+$", options: .regularExpression) else {
+          throw DecodableXPathError(xpath: string)
+        }
 
         let matches = regex.matches(in: string, range: NSRange(range, in: string))
 
