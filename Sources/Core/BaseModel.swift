@@ -69,7 +69,7 @@ extension Array: BaseModel where Element: BaseModel {
 
   public init(_ container: Element.DataContainer) throws {
     guard var iterator = container.multiple() else {
-      throw "instance of \(Element.DataContainer.self) is not iteratable"
+      throw GnomonError.dataContainerDoesNotSupportArrays(containerType: "\(Element.DataContainer.self)")
     }
     var result = [Element]()
     if let count = iterator.count {

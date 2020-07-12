@@ -12,7 +12,7 @@ import SwiftyJSON
 extension JSON {
 
   func xpath(_ path: String) throws -> JSON {
-    guard path.count > 0 else { throw "empty xpath" }
+    guard path.count > 0 else { throw JSONParseError.emptyXPath }
     let components = path.components(separatedBy: "/")
     guard components.count > 0 else { return self }
     return try xpath(components)
@@ -22,7 +22,7 @@ extension JSON {
     guard let key = components.first else { return self }
     let value = self[key]
     guard value.exists() else {
-      throw "can't find key \(key) in json \(self)"
+      throw JSONParseError.noKeyInJSON(key: key, json: self)
     }
     return try value.xpath(Array(components.dropFirst()))
   }

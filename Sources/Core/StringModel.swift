@@ -12,7 +12,7 @@ extension StringModel {
 
   public static func dataContainer(with data: Data, at path: String?) throws -> DataContainer {
     guard let string = String(data: data, encoding: encoding) else {
-      throw "can't parse String with encoding \(encoding)"
+      throw StringParseError(encoding: encoding)
     }
     return string
   }
@@ -24,7 +24,7 @@ extension String: DataContainerProtocol {
   public typealias Iterator = GenericDataContainerIterator<String>
 
   public static func container(with data: Data, at path: String?) throws -> String {
-    throw "should be implemented in StringModel"
+    preconditionFailure("this method should not be called since StringModel.dataContainer is implemented")
   }
 
   public func multiple() -> GenericDataContainerIterator<String>? {

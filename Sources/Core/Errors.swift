@@ -8,6 +8,7 @@ public enum GnomonError: Error {
   case errorStatusCode(Int, Data)
 
   case unableToParseModel(Error)
+  case dataContainerDoesNotSupportArrays(containerType: String)
 }
 
 public enum MultipartEncodingError: Error {
@@ -16,3 +17,20 @@ public enum MultipartEncodingError: Error {
   case invalidKeyOrFileName(key: String, fileName: String)
   case invalidContentTypeString(String)
 }
+
+public struct StringParseError: LocalizedError {
+  public let encoding: String.Encoding
+
+  public var errorDescription: String? {
+    "can't parse StringModel from Data with required encoding \(encoding)"
+  }
+}
+
+#if JSON
+import struct SwiftyJSON.JSON
+
+public enum JSONParseError: Error {
+  case emptyXPath
+  case noKeyInJSON(key: String, json: JSON)
+}
+#endif

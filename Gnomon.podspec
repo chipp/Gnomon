@@ -25,17 +25,20 @@ Pod::Spec.new do |s|
   s.subspec "Decodable" do |sub|
     sub.source_files = "Sources/Decodable/*.swift"
     sub.dependency "Gnomon/Core"
+    sub.pod_target_xcconfig = { "SWIFT_ACTIVE_COMPILATION_CONDITIONS" => "$(inherited) DECODABLE" }
   end
 
   s.subspec "JSON" do |sub|
     sub.source_files = "Sources/JSON/*.swift"
     sub.dependency "SwiftyJSON", "~> 5"
     sub.dependency "Gnomon/Core"
+    sub.pod_target_xcconfig = { "SWIFT_ACTIVE_COMPILATION_CONDITIONS" => "$(inherited) JSON" }
   end
 
   s.subspec "XML" do |sub|
     sub.source_files = "Sources/XML/*.swift"
     sub.dependency "AEXML", "~> 4.2"
     sub.dependency "Gnomon/Core"
+    sub.pod_target_xcconfig = { "SWIFT_ACTIVE_COMPILATION_CONDITIONS" => "$(inherited) XML" }
   end
 end
