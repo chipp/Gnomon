@@ -75,9 +75,9 @@ public class Request<Model: BaseModel> {
     self.url = url
   }
 
-  public convenience init(URLString: String) throws {
-    guard let url = URL(string: URLString) else { throw "invalid url \"\(URLString)\"" }
-    self.init(url: url)
+  public init(URLString: String) throws {
+    guard let url = URL(string: URLString) else { throw GnomonError.invalidURLString(URLString) }
+    self.url = url
   }
 
   public var xpath: String?

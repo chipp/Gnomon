@@ -9,6 +9,8 @@ public enum GnomonError: Error {
 
   case unableToParseModel(Error)
   case dataContainerDoesNotSupportArrays(containerType: String)
+
+  case invalidURLString(String)
 }
 
 public enum MultipartEncodingError: Error {

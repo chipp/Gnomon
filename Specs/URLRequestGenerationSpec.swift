@@ -24,8 +24,7 @@ class URLRequestGenerationSpec: XCTestCase {
     do {
       _ = try Request<String>(URLString: "ß")
       fail("should fail")
-    } catch let error as String {
-      expect(error) == "invalid url \"ß\""
+    } catch GnomonError.invalidURLString("ß") {
     } catch {
       fail("\(error)")
     }
